@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/users');
+
 
 mongoose.connect(`mongodb+srv://node-shop:${process.env.MONGO_URL}@cluster0.jxjfv.mongodb.net/node-shop?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
@@ -43,6 +45,8 @@ app.use(cors());
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
+
 
 
 // Global 404 error
