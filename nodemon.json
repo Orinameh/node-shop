@@ -1,5 +1,6 @@
 {
     "env": {
-        "MONGO_URL": "node-shop"
+        "MONGO_URL": "node-shop",
+        "JWT_KEY": "secretjwtkey"
     }
 }

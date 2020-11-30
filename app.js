@@ -12,7 +12,8 @@ const userRoutes = require('./api/routes/users');
 
 mongoose.connect(`mongodb+srv://node-shop:${process.env.MONGO_URL}@cluster0.jxjfv.mongodb.net/node-shop?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
 }).then(()=>{
     console.log("mongodb is connected");
 }).catch((error)=>{

@@ -2,49 +2,86 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
 router.post('/signup', (req, res, next) => {
-    User.find({ email: req.body.email}).exec()
-    .then(user => {
-        if(user.length >= 1) {
-            res.status(422).json({
-                message: 'User already exists'
-            });
-        } else {
-            bcrypt.hash(req.body.password, 10, (err, hash) => {
-                if(err) {
-                    return res.status(500).json({ err });
-                } else {
-                    const user = new User({
-                        _id: mongoose.Types.ObjectId(),
-                        email: req.body.email,
-                        password: hash
-                    });
-        
-                    user.save()
-                    .then(u => {
-                        res.status(201).json({
-                            message: 'User created',
-                            user: {
-                                email: u.email,
-                                _id: u._id
-                            }
-                        })
-                    }).catch(error => {
-                        res.status(500).json({
-                            error
-                        })
+    User.find({ email: req.body.email }).exec()
+        .then(user => {
+            if (user.length >= 1) {
+                res.status(422).json({
+                    message: 'User already exists'
+                });
+            } else {
+                bcrypt.hash(req.body.password, 10, (err, hash) => {
+                    if (err) {
+                        return res.status(500).json({ err });
+                    } else {
+                        const user = new User({
+                            _id: mongoose.Types.ObjectId(),
+                            email: req.body.email,
+                            password: hash
+                        });
+
+                        user.save()
+                            .then(u => {
+                                res.status(201).json({
+                                    message: 'User created',
+                                    user: {
+                                        email: u.email,
+                                        _id: u._id
+                                    }
+                                })
+                            }).catch(error => {
+                                res.status(500).json({
+                                    error
+                                })
+                            })
+                    }
+
+                })
+            }
+        }).catch()
+
+
+});
+
+router.post('/login', (req, res, next) => {
+    User.findOne({ email: req.body.email }).exec()
+        .then(user => {
+            if (!user) {
+                return res.status(401).json({ message: "Login failed" });
+            }
+
+            bcrypt.compare(req.body.password, user.password, (err, result) => {
+                if (err) {
+                    return res.status(401).json({ message: "Login failed" });
+                }
+
+                if (result) {
+                    const token = jwt.sign({
+                        email: user.email,
+                        userId: user._id
+                        }, process.env.JWT_KEY, 
+                        { expiresIn: '1h' }
+                    );
+                    return res.status(200).json({
+                        message: 'Login successful',
+                        token
                     })
                 }
-        
-            })
-        }
-    }).catch()
-    
+                return res.status(401).json({ message: "Login failed" });
 
-})
+            });
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                err
+            });
+        })
+});
 
 router.delete('/:userId', (req, res, next) => {
     const _id = req.params.userId;
