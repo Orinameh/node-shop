@@ -25,7 +25,6 @@ mongoose.connect(`mongodb+srv://node-shop:${process.env.MONGO_URL}@cluster0.jxjf
 app.use(morgan('dev')); 
 app.use('/uploads', express.static('uploads')); //makes the uploads folder available
 
-// You don't need bodyParser, this comes with express ie express.urlencoded and express.json
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
